@@ -112,11 +112,12 @@ class Employee():
         text = output['text']
 
         scores = sia.polarity_scores(text)
+        # eg {'neg': 0.0, 'neu': 0.328, 'pos': 0.672, 'compound': 0.6249}
 
-        print(f'   DEBUG> How does {self.first_name} feel? {text} . {scores}')
+        # print(f'   DEBUG> How does {self.first_name} feel? {text} . {scores}')
         
         # Compound is closer to 1.0 when 'pos' is close to 1.0 
-        return scores.get('compound', 0.0)
+        return scores, text
         
 
     def get_description(self):
@@ -182,19 +183,25 @@ conversation = [
 
 sia = SentimentIntensityAnalyzer()
 
-happiness_score_to_win = 0.5
+happiness_score_to_win = 0.45
 
 skip_happiness_check = False
 
 while True:
     if not skip_happiness_check:
-        employee_a_score = employee_a.get_happiness_score(lm, conversation, sia)
-        employee_b_score = employee_b.get_happiness_score(lm, conversation, sia)
-        print(f'Scores: {employee_a.name} is {employee_a_score}, {employee_b.name} is {employee_b_score} ')
+        employee_a_scores, employee_a_feeling  = employee_a.get_happiness_score(lm, conversation, sia)
+        employee_b_scores, employee_b_feeling = employee_b.get_happiness_score(lm, conversation, sia)
+        print('===== Scores =====')
+        print(f'{employee_a.name} feels {employee_a_feeling} ({employee_a_scores})')
+        print(f'{employee_b.name} feels {employee_b_feeling} ({employee_b_scores})')
+        print('==================')
 
-        if employee_a_score > happiness_score_to_win and employee_b_score > happiness_score_to_win:
+        at_least_one_is_unhappy = employee_a_scores.get('neg', 0.0) > 0.1 or employee_b_scores.get('neg', 0.0) > 0.1
+        at_least_one_is_mildly_happy = employee_a_scores.get('pos', 0.0) > 0.3 or employee_b_scores.get('pos', 0.0) > 0.3
+        
+        if not at_least_one_is_unhappy and at_least_one_is_mildly_happy:
             print()
-            print('Success! You took {len(conversation) / 3} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
+            print(f'Success! You took {len(conversation) / 3} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
             print()
             break
     
