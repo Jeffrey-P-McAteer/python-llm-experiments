@@ -36,6 +36,15 @@ except:
     ])
     import gender_guesser.detector as gender
 
+# Used to ask employees how they feel about the situation for background game scoring.
+try:
+    from nltk.sentiment import SentimentIntensityAnalyzer
+except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', '--user', 'nltk'
+    ])
+    from nltk.sentiment import SentimentIntensityAnalyzer
 
 # See https://github.com/Pan-ML/panml
 try:
@@ -86,12 +95,20 @@ class Employee():
             age=self.age,
         )
     
-    def tell(self, text):
-        pass
+    # Number from 0 to 1, 0 means mad 1 means happy.
+    def get_happiness_score(self, lm, conversation, sia):
+        prompt_text = '\n'.join(conversation)
+        prompt_text += '\n'
+        prompt_text += 'How does {self.first_name} feel?'
 
-    def is_happy(self):
+        output = lm.predict(prompt_text, max_length=3500)
+        text = output['text']
 
-        return False
+        scores = sia.polarity_scores(text)
+        
+        # Compound is closer to 1.0 when 'pos' is close to 1.0 
+        return scores.get('compound', 0.0)
+        
 
     def get_description(self):
         return self.employee_description
@@ -117,7 +134,7 @@ game_problem = random.choice(problems).format(
 
 print()
 print('You are a manager and two employees with a problem have come into your office.')
-print('Talk them through their problem until both employees are happy.')
+print('Talk them through their problem until both employees are happy (measured by a happniness score of 1.0)')
 print()
 
 
@@ -146,7 +163,6 @@ print()
 
 lm = ModelPack(model=model_to_use, source=model_source)
 
-
 # Try to nudge the language model in a useful direction by
 # beginning the conversation w/ a prompt.
 conversation = [
@@ -155,13 +171,27 @@ conversation = [
     game_problem
 ]
 
+sia = SentimentIntensityAnalyzer()
+
+happiness_score_to_win = 0.75
+
 while True:
+    employee_a_score = employee_a.get_happiness_score(lm, conversation, sia)
+    employee_b_score = employee_b.get_happiness_score(lm, conversation, sia)
+    print(f'Scores: {employee_a.name} is {employee_a_score}, {employee_b.name} is {employee_b_score} ')
+
+    if employee_a_score > happiness_score_to_win and employee_b_score > happiness_score_to_win:
+        print()
+        print('Success! You took {len(conversation) / 3} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
+        print()
+        break
+
     user_input = input('Manager> ')
+    user_input = user_input.strip()
+
     if user_input == 'q' or user_input == 'quit' or user_input == 'exit':
         print(f'Got {user_input}, exiting...')
         break
-
-    user_input = user_input.strip()
 
     if len(user_input) < 1:
         continue
@@ -169,6 +199,7 @@ while True:
     conversation.append(f'Manager: {user_input}')
 
     prompt_text = '\n'.join(conversation)
+    prompt_text += '\n'
     prompt_text += f'{employee_a.first_name}: ' # Prompt for employee A next statement
     employee_a_output = lm.predict(prompt_text, max_length=3500)
 
@@ -183,6 +214,7 @@ while True:
 
 
     prompt_text = '\n'.join(conversation)
+    prompt_text += '\n'
     prompt_text += f'{employee_b.first_name}: ' # Prompt for employee B next statement
     employee_b_output = lm.predict(prompt_text, max_length=3500)
 
