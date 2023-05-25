@@ -53,7 +53,7 @@ while True:
 
     user_input = user_input.strip()
     
-    conversation.append(f'User: {user_input}')
+    conversation.append(f'{user_input}')
 
     # See https://github.com/Pan-ML/panml/blob/main/panml/core/llm/huggingface.py#L88
     prompt_text = '\n'.join(conversation)
@@ -67,7 +67,7 @@ while True:
 
     print(f'BOT> {bot_text}')
 
-    conversation.append(f'Bot: {bot_text}')
+    conversation.append(f'{bot_text}')
 
 
 
