@@ -64,9 +64,13 @@ print()
 random.seed(game_seed)
 
 class Employee():
-    def __init__(self, name, employee_description):
-        self.name = name
-        
+    def __init__(self, fake, employee_description):
+        self.name = fake.name()
+        self.first_name = self.name.split()[0]
+        self.last_name = self.name.split()[-1]
+
+        self.job = fake.job()
+
         self.gender = gender.Detector().get_gender(self.name.split()[0])
         if self.gender == 'andy':
             self.gender = random.choice(['male', 'female'])
@@ -75,6 +79,9 @@ class Employee():
 
         self.employee_description = employee_description.format(
             name=self.name,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            job=self.job,
             gender=self.gender,
             age=self.age,
         )
@@ -92,12 +99,12 @@ class Employee():
 fake = Faker()
 fake.seed_instance(game_seed)
 
-employee_a = Employee(fake.name(), '{name} is a {age}-year-old {gender}.')
-employee_b = Employee(fake.name(), '{name} is a {age}-year-old {gender}.')
+employee_a = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is the {job} around here.')
+employee_b = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is our {job} around here.')
 
 problems = [
     'Something broke',
-    'Refridgerator stinks',
+    'Refrigerator stinks',
 ]
 
 game_problem = random.choice(problems)
