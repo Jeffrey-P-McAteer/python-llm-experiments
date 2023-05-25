@@ -73,6 +73,8 @@ else:
 
 print(f'game_seed = {game_seed}')
 print('Remember the game seed if you want to play the same game again by passing it as Arg1!')
+MAX_GAME_TOKENS = int(os.environ.get('MAX_GAME_TOKENS', '6500'))
+print(f'MAX_GAME_TOKENS = {MAX_GAME_TOKENS}')
 print()
 
 random.seed(game_seed)
@@ -106,7 +108,7 @@ class Employee():
         prompt_text += '\n'
         prompt_text += f'How does {self.first_name} feel?'
 
-        output = lm.predict(prompt_text, max_length=3500)
+        output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
         text = output['text']
 
         scores = sia.polarity_scores(text)
@@ -213,7 +215,7 @@ while True:
     prompt_text = '\n'.join(conversation)
     prompt_text += '\n'
     prompt_text += f'{employee_a.first_name}: ' # Prompt for employee A next statement
-    employee_a_output = lm.predict(prompt_text, max_length=3500)
+    employee_a_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
 
     employee_a_text = employee_a_output['text']
     employee_a_text = ':'.join(employee_a_text.split(':')[1:]) # Trim first ABC: beginning of the line
@@ -228,7 +230,7 @@ while True:
     prompt_text = '\n'.join(conversation)
     prompt_text += '\n'
     prompt_text += f'{employee_b.first_name}: ' # Prompt for employee B next statement
-    employee_b_output = lm.predict(prompt_text, max_length=3500)
+    employee_b_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
 
     employee_b_text = employee_b_output['text']
     employee_b_text = ':'.join(employee_b_text.split(':')[1:]) # Trim first ABC: beginning of the line
