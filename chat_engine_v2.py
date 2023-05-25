@@ -120,15 +120,13 @@ print('You are a manager and two employees with a problem have come into your of
 print('Talk them through their problem until both employees are happy.')
 print()
 
+
 print(employee_a.get_description())
 print()
 print(employee_b.get_description())
 print()
 print(game_problem)
 print()
-
-sys.exit(1)
-
 
 
 # See https://github.com/Pan-ML/panml/wiki/8.-Supported-models
@@ -146,15 +144,15 @@ print()
 print(f'Loading {model_to_use} from {model_source}')
 print()
 
-# lm = ModelPack(model=model_to_use, source=model_source)
-
-
+lm = ModelPack(model=model_to_use, source=model_source)
 
 
 # Try to nudge the language model in a useful direction by
 # beginning the conversation w/ a prompt.
 conversation = [
-    'You are a successful manager who creatively solves employee problems. Please solve Person1\'s problem by talking to them.'
+    employee_a.get_description(),
+    employee_b.get_description(),
+    game_problem
 ]
 
 while True:
@@ -168,23 +166,36 @@ while True:
     if len(user_input) < 1:
         continue
     
-    conversation.append(f'Person1: {user_input}')
+    conversation.append(f'Manager: {user_input}')
 
-    # See https://github.com/Pan-ML/panml/blob/main/panml/core/llm/huggingface.py#L88
     prompt_text = '\n'.join(conversation)
-    output = lm.predict(prompt_text, max_length=3500)
+    prompt_text += f'{employee_a.first_name}: ' # Prompt for employee A next statement
+    employee_a_output = lm.predict(prompt_text, max_length=3500)
 
-    bot_text = output['text'].strip()
-    bot_text = bot_text.lstrip('Person1: ')
-    bot_text = bot_text.lstrip('person1: ')
-    bot_text = bot_text.lstrip('Person2: ')
-    bot_text = bot_text.lstrip('person2: ')
-    if len(bot_text) < 2:
-        bot_text = output['text'].strip()
+    employee_a_text = employee_a_output['text']
+    employee_a_text = ':'.join(employee_a_text.split(':')[1:]) # Trim first ABC: beginning of the line
+    if len(employee_a_text) < 2:
+        employee_a_text = employee_a_output['text'].strip()
 
-    print(f'BOT> {bot_text}')
 
-    conversation.append(f'Person2: {bot_text}')
+    print(f'{employee_a.first_name}: {employee_a_text}')
+    conversation.append(f'{employee_a.first_name}: {employee_a_text}')
+
+
+    prompt_text = '\n'.join(conversation)
+    prompt_text += f'{employee_b.first_name}: ' # Prompt for employee B next statement
+    employee_b_output = lm.predict(prompt_text, max_length=3500)
+
+    employee_b_text = employee_b_output['text']
+    employee_b_text = ':'.join(employee_b_text.split(':')[1:]) # Trim first ABC: beginning of the line
+    if len(employee_b_text) < 2:
+        employee_b_text = employee_b_output['text'].strip()
+
+
+    print(f'{employee_b.first_name}: {employee_b_text}')
+    conversation.append(f'{employee_b.first_name}: {employee_b_text}')
+
+
 
 
 
