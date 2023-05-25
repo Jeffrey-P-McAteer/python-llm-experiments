@@ -73,7 +73,7 @@ else:
 
 print(f'game_seed = {game_seed}')
 print('Remember the game seed if you want to play the same game again by passing it as Arg1!')
-MAX_GAME_TOKENS = int(os.environ.get('MAX_GAME_TOKENS', '6500'))
+MAX_GAME_TOKENS = int(os.environ.get('MAX_GAME_TOKENS', '12500'))
 print(f'MAX_GAME_TOKENS = {MAX_GAME_TOKENS}')
 print()
 
@@ -182,8 +182,6 @@ conversation = [
 ]
 
 sia = SentimentIntensityAnalyzer()
-
-happiness_score_to_win = 0.45
 
 skip_happiness_check = False
 
