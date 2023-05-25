@@ -102,12 +102,17 @@ fake.seed_instance(game_seed)
 employee_a = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is the {job} around here.')
 employee_b = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is our {job} around here.')
 
+
 problems = [
-    'Something broke',
-    'Refrigerator stinks',
+    '{a.first_name} decided to throw a party after work and did not invite {b.first_name}. {b.first_name} feels left out.',
+    '{a.first_name} is putting day-old pizza boxes in the trash and not taking the trash out. {b.first_name} ends up always doing the work!',
+    '{a.first_name} has ruined {b.first_name}\'s project!',
 ]
 
-game_problem = random.choice(problems)
+game_problem = random.choice(problems).format(
+    a=employee_a,
+    b=employee_b
+)
 
 
 print()
