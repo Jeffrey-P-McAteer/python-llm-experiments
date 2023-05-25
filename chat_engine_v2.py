@@ -104,7 +104,7 @@ class Employee():
     def get_happiness_score(self, lm, conversation, sia):
         prompt_text = '\n'.join(conversation)
         prompt_text += '\n'
-        prompt_text += 'How does {self.first_name} feel?'
+        prompt_text += f'How does {self.first_name} feel?'
 
         output = lm.predict(prompt_text, max_length=3500)
         text = output['text']
