@@ -144,7 +144,7 @@ game_problem = random.choice(problems).format(
 
 print()
 print('You are a manager and two employees with a problem have come into your office.')
-print('Talk them through their problem until both employees are happy (measured by a happniness score of 1.0)')
+print('Talk them through their problem until both employees are happy.')
 print()
 
 
