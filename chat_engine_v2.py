@@ -46,6 +46,11 @@ except:
     ])
     from nltk.sentiment import SentimentIntensityAnalyzer
 
+import nltk
+nltk.download('vader_lexicon', download_dir=os.environ["TRANSFORMERS_CACHE"])
+nltk.data.path.append(os.environ["TRANSFORMERS_CACHE"])
+
+
 # See https://github.com/Pan-ML/panml
 try:
     import panml
@@ -95,7 +100,7 @@ class Employee():
             age=self.age,
         )
     
-    # Number from 0 to 1, 0 means mad 1 means happy.
+    # Number from -1 to 1, -1 means mad 1 means happy.
     def get_happiness_score(self, lm, conversation, sia):
         prompt_text = '\n'.join(conversation)
         prompt_text += '\n'
@@ -105,6 +110,8 @@ class Employee():
         text = output['text']
 
         scores = sia.polarity_scores(text)
+
+        print(f'   DEBUG> How does {self.first_name} feel? {text} . {scores}')
         
         # Compound is closer to 1.0 when 'pos' is close to 1.0 
         return scores.get('compound', 0.0)
@@ -173,19 +180,23 @@ conversation = [
 
 sia = SentimentIntensityAnalyzer()
 
-happiness_score_to_win = 0.75
+happiness_score_to_win = 0.5
+
+skip_happiness_check = False
 
 while True:
-    employee_a_score = employee_a.get_happiness_score(lm, conversation, sia)
-    employee_b_score = employee_b.get_happiness_score(lm, conversation, sia)
-    print(f'Scores: {employee_a.name} is {employee_a_score}, {employee_b.name} is {employee_b_score} ')
+    if not skip_happiness_check:
+        employee_a_score = employee_a.get_happiness_score(lm, conversation, sia)
+        employee_b_score = employee_b.get_happiness_score(lm, conversation, sia)
+        print(f'Scores: {employee_a.name} is {employee_a_score}, {employee_b.name} is {employee_b_score} ')
 
-    if employee_a_score > happiness_score_to_win and employee_b_score > happiness_score_to_win:
-        print()
-        print('Success! You took {len(conversation) / 3} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
-        print()
-        break
-
+        if employee_a_score > happiness_score_to_win and employee_b_score > happiness_score_to_win:
+            print()
+            print('Success! You took {len(conversation) / 3} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
+            print()
+            break
+    
+    skip_happiness_check = False
     user_input = input('Manager> ')
     user_input = user_input.strip()
 
@@ -194,6 +205,7 @@ while True:
         break
 
     if len(user_input) < 1:
+        skip_happiness_check = True # Same game state
         continue
     
     conversation.append(f'Manager: {user_input}')
