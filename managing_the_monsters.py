@@ -7,6 +7,13 @@ import shutil
 import time
 import random
 
+# This trick allows us to install packages w/o modifying the --user site-packages
+py_packages_folder = os.path.join(os.path.dirname(__file__), '.py-packages')
+if not os.path.exists(py_packages_folder):
+    os.makedirs(py_packages_folder, exist_ok=True)
+sys.path.append(py_packages_folder)
+
+
 if not 'TRANSFORMERS_CACHE' in os.environ:
     os.environ['TRANSFORMERS_CACHE'] = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -22,7 +29,7 @@ try:
 except:
     traceback.print_exc()
     subprocess.run([
-        sys.executable, '-m', 'pip', 'install', '--user', 'faker'
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'faker'
     ])
     from faker import Faker
 
@@ -32,7 +39,7 @@ try:
 except:
     traceback.print_exc()
     subprocess.run([
-        sys.executable, '-m', 'pip', 'install', '--user', 'gender-guesser'
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'gender-guesser'
     ])
     import gender_guesser.detector as gender
 
@@ -42,7 +49,7 @@ try:
 except:
     traceback.print_exc()
     subprocess.run([
-        sys.executable, '-m', 'pip', 'install', '--user', 'nltk'
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'nltk'
     ])
     from nltk.sentiment import SentimentIntensityAnalyzer
 
@@ -57,12 +64,11 @@ try:
 except:
     traceback.print_exc()
     subprocess.run([
-        sys.executable, '-m', 'pip', 'install', '--user', 'panml'
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'panml'
     ])
     import panml
 
 from panml.models import ModelPack
-
 
 
 game_seed = 0
