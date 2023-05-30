@@ -177,7 +177,7 @@ print()
 print(f'Loading {model_to_use} from {model_source}')
 print()
 
-lm = ModelPack(model=model_to_use, source=model_source)
+lm = ModelPack(model=model_to_use, source=model_source, model_args={'gpu': True})
 
 # Try to nudge the language model in a useful direction by
 # beginning the conversation w/ a prompt.
