@@ -193,9 +193,9 @@ skip_happiness_check = False
 
 while True:
     if not skip_happiness_check:
+        print('===== Scores =====')
         employee_a_scores, employee_a_feeling  = employee_a.get_happiness_score(lm, conversation, sia)
         employee_b_scores, employee_b_feeling = employee_b.get_happiness_score(lm, conversation, sia)
-        print('===== Scores =====')
         print(f'{employee_a.name} feels {employee_a_feeling} ({employee_a_scores})')
         print(f'{employee_b.name} feels {employee_b_feeling} ({employee_b_scores})')
         print('==================')
