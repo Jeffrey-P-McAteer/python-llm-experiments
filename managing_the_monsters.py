@@ -170,9 +170,16 @@ print()
 #model_to_use = 'cerebras/Cerebras-GPT-13B'
 #model_to_use = 'google/flan-t5-base' # 250m parameter model
 #model_to_use = 'google/flan-t5-xxl' # 11b parameter model, needs 64+gb ram
-model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
+#model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
 #model_to_use = 'google/flan-t5-large' # 780m parameter model
 #model_to_use = 'EleutherAI/gpt-j-6b'
+
+
+#model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
+#model_to_use = 'cerebras/Cerebras-GPT-590M'
+model_to_use = 'EleutherAI/gpt-neo-2.7B'
+model_to_use = 'google/flan-t5-large'
+
 model_source = 'huggingface'
 
 print()
@@ -225,37 +232,55 @@ while True:
     
     conversation.append(f'Manager: {user_input}')
 
-    prompt_text = '\n'.join(conversation)
-    prompt_text += '\n'
-    prompt_text += f'{employee_a.first_name}: ' # Prompt for employee A next statement
-    employee_a_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+    # Now ask the AI model who speaks next, and continue prompting for employee_a.first_name / employee_b.first_name
+    # until "Manager" is selected as the next speaker.
+    next_to_speak = ''
+    while not 'manager' in next_to_speak.lower():
+        prompt_text = '\n'.join(conversation)
+        prompt_text += '\n'
+        prompt_text += 'Who speaks next?'
 
-    employee_a_text = employee_a_output['text']
-    employee_a_text = ':'.join(employee_a_text.split(':')[1:]) # Trim first ABC: beginning of the line
-    if len(employee_a_text) < 2:
-        employee_a_text = employee_a_output['text'].strip()
+        next_speaker_out = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+        
+        next_to_speak = next_speaker_out["text"]
 
-
-    print(f'{employee_a.first_name}: {employee_a_text}')
-    conversation.append(f'{employee_a.first_name}: {employee_a_text}')
-
-
-    prompt_text = '\n'.join(conversation)
-    prompt_text += '\n'
-    prompt_text += f'{employee_b.first_name}: ' # Prompt for employee B next statement
-    employee_b_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
-
-    employee_b_text = employee_b_output['text']
-    employee_b_text = ':'.join(employee_b_text.split(':')[1:]) # Trim first ABC: beginning of the line
-    if len(employee_b_text) < 2:
-        employee_b_text = employee_b_output['text'].strip()
-
-
-    print(f'{employee_b.first_name}: {employee_b_text}')
-    conversation.append(f'{employee_b.first_name}: {employee_b_text}')
-
-
-
+        print(f'DEBUG: next_to_speak={next_to_speak}')
+        
+        if employee_a.first_name.lower() in next_to_speak.lower():
+            # Prompt Employee A for next spoken dialog
+            prompt_text = '\n'.join(conversation)
+            prompt_text += '\n'
+            prompt_text += f'{employee_a.first_name}: '
+            employee_a_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+            employee_a_text = employee_a_output['text']
+            employee_a_text = ':'.join(employee_a_text.split(':')[1:]) # Trim first ABC: beginning of the line
+            if len(employee_a_text) < 2:
+                employee_a_text = employee_a_output['text'].strip()
+            #print(f'{employee_a.first_name}: {employee_a_text}')
+            #conversation.append(f'{employee_a.first_name}: {employee_a_text}')
+        
+        if employee_b.first_name.lower() in next_to_speak.lower():
+            # Prompt Employee A for next spoken dialog
+            prompt_text = '\n'.join(conversation)
+            prompt_text += '\n'
+            prompt_text += f'{employee_b.first_name}: '
+            employee_b_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+            employee_b_text = employee_b_output['text']
+            employee_b_text = ':'.join(employee_b_text.split(':')[1:]) # Trim first ABC: beginning of the line
+            if len(employee_b_text) < 2:
+                employee_b_text = employee_b_output['text'].strip()
+            #print(f'{employee_b.first_name}: {employee_b_text}')
+            #conversation.append(f'{employee_b.first_name}: {employee_b_text}')
+        
+        # Now output stuff
+        if employee_a.first_name.lower() in next_to_speak.lower():
+            print(f'{employee_a.first_name}: {employee_a_text}')
+            conversation.append(f'{employee_a.first_name}: {employee_a_text}')
+        
+        if employee_b.first_name.lower() in next_to_speak.lower():
+            print(f'{employee_b.first_name}: {employee_b_text}')
+            conversation.append(f'{employee_b.first_name}: {employee_b_text}')
+    
 
 
 print('Goodbye!')
