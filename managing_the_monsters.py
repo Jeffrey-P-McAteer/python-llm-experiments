@@ -266,9 +266,7 @@ while True:
         prompt_text += '\n'
         prompt_text += 'Who speaks next?'
 
-        next_speaker_out = predict(prompt_text)
-        
-        next_to_speak = next_speaker_out["text"]
+        next_to_speak = predict(prompt_text)
 
         if DEBUG:
             print(f'DEBUG: next_to_speak={next_to_speak}')
