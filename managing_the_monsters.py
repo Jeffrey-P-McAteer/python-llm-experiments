@@ -168,9 +168,8 @@ class Employee():
         prompt_text += '\n'
         prompt_text += f'How does {self.first_name} feel?'
 
-        output = predict(prompt_text)
-        text = output['text']
-
+        text = predict(prompt_text)
+        
         scores = sia.polarity_scores(text)
         # eg {'neg': 0.0, 'neu': 0.328, 'pos': 0.672, 'compound': 0.6249}
 
