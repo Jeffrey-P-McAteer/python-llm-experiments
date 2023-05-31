@@ -96,6 +96,8 @@ class Employee():
         self.gender = gender.Detector().get_gender(self.name.split()[0])
         if self.gender == 'andy':
             self.gender = random.choice(['male', 'female'])
+        self.gender = self.gender.replace('mostly_', '')
+        self.gender = self.gender.replace('half_', '')
         
         self.age = random.randint(18, 72)
 
