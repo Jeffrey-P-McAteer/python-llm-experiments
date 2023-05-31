@@ -175,10 +175,11 @@ print()
 #model_to_use = 'EleutherAI/gpt-j-6b'
 
 
-model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
+#model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
 #model_to_use = 'cerebras/Cerebras-GPT-590M'
 #model_to_use = 'EleutherAI/gpt-neo-2.7B'
 #model_to_use = 'google/flan-t5-large'
+model_to_use = 'gpt2'
 
 model_source = 'huggingface'
 
