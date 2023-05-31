@@ -13,7 +13,6 @@ if not os.path.exists(py_packages_folder):
     os.makedirs(py_packages_folder, exist_ok=True)
 sys.path.append(py_packages_folder)
 
-
 if not 'TRANSFORMERS_CACHE' in os.environ:
     os.environ['TRANSFORMERS_CACHE'] = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
@@ -22,6 +21,13 @@ if not 'TRANSFORMERS_CACHE' in os.environ:
 
 print(f'Using TRANSFORMERS_CACHE = {os.environ["TRANSFORMERS_CACHE"]}')
 os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
+
+
+DEBUG = False
+if 'DEBUG' in os.environ:
+    DEBUG = bool(os.environ['DEBUG'])
+
+print(f'DEBUG = {DEBUG}')
 
 # Used for names
 try:
@@ -57,20 +63,64 @@ import nltk
 nltk.download('vader_lexicon', download_dir=os.environ["TRANSFORMERS_CACHE"])
 nltk.data.path.append(os.environ["TRANSFORMERS_CACHE"])
 
+llm_server_folder = os.path.join(os.path.dirname(__file__), 'llm-server-folder')
+if not os.path.exists(llm_server_folder):
+    os.makedirs(llm_server_folder, exist_ok=True)
 
-# See https://github.com/Pan-ML/panml
-try:
-    import panml
-except:
-    traceback.print_exc()
-    subprocess.run([
-        #sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'panml'
-        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'git+https://github.com/Pan-ML/panml.git'
-    ])
-    import panml
+# Ensure a server process is running by creating a file that the server always deletes.
+server_live_check_txt = os.path.join(llm_server_folder, 'server-live-check.txt')
+with open(server_live_check_txt, 'w') as fd:
+    fd.write('Test!')
 
-from panml.models import ModelPack
+# We expect the server to delete the file within 5 seconds, if it still exists we must launch llm_server.py
+for _ in range(0, 6*4):
+    time.sleep(1.0/4.0)
+    if not os.path.exists(server_live_check_txt):
+        break
 
+if os.path.exists(server_live_check_txt):
+    # Spawn a server!
+    # See https://github.com/Pan-ML/panml/wiki/8.-Supported-models
+    model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
+    model_source = 'huggingface'
+    server_cmd_args = [
+        sys.executable, os.path.join(os.path.dirname(__file__), 'llm_server.py'),
+            model_source, model_to_use, llm_server_folder,
+    ]
+    print()
+    print('> ', ' '.join(server_cmd_args))
+    print()
+
+    subprocess.Popen(server_cmd_args)
+
+    # Also wait until it removes server-live-check.txt
+    print(f'Waiting for server to come up...')
+    while os.path.exists(server_live_check_txt):
+        time.sleep(2)
+        print(f'Waiting for server to come up...')
+    print(f'Server is up!')
+
+
+def predict(text):
+    predict_txt = os.path.join(llm_server_folder, 'predict.txt')
+    with open(predict_txt, 'w') as fd:
+        fd.write(text)
+
+    response_txt = os.path.join(llm_server_folder, 'response.txt')
+    while not os.path.exists(response_txt):
+        time.sleep(0.1)
+
+    response_s = ''
+    with open(response_txt, 'r') as fd:
+        response_s = fd.read()
+        if not isinstance(response_s, str):
+            response_s = response_s.decode('utf-8')
+
+    os.remove(response_txt)
+    if os.path.exists(predict_txt):
+        os.remove(predict_txt)
+
+    return response_s
 
 game_seed = 0
 if len(sys.argv) > 1:
@@ -84,6 +134,7 @@ MAX_GAME_TOKENS = int(os.environ.get('MAX_GAME_TOKENS', '12500'))
 print(f'MAX_GAME_TOKENS = {MAX_GAME_TOKENS}')
 print()
 
+os.environ['MAX_GAME_TOKENS'] = str(MAX_GAME_TOKENS)
 random.seed(game_seed)
 
 class Employee():
@@ -112,12 +163,12 @@ class Employee():
         )
     
     # Number from -1 to 1, -1 means mad 1 means happy.
-    def get_happiness_score(self, lm, conversation, sia):
+    def get_happiness_score(self, conversation, sia):
         prompt_text = '\n'.join(conversation)
         prompt_text += '\n'
         prompt_text += f'How does {self.first_name} feel?'
 
-        output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+        output = predict(prompt_text)
         text = output['text']
 
         scores = sia.polarity_scores(text)
@@ -164,32 +215,6 @@ print()
 print(game_problem)
 print()
 
-
-# See https://github.com/Pan-ML/panml/wiki/8.-Supported-models
-#model_to_use = 'gpt2'
-#model_to_use = 'cerebras/Cerebras-GPT-590M'
-#model_to_use = 'cerebras/Cerebras-GPT-13B'
-#model_to_use = 'google/flan-t5-base' # 250m parameter model
-#model_to_use = 'google/flan-t5-xxl' # 11b parameter model, needs 64+gb ram
-#model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
-#model_to_use = 'google/flan-t5-large' # 780m parameter model
-#model_to_use = 'EleutherAI/gpt-j-6b'
-
-
-model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
-#model_to_use = 'cerebras/Cerebras-GPT-590M'
-#model_to_use = 'EleutherAI/gpt-neo-2.7B'
-#model_to_use = 'google/flan-t5-large'
-#model_to_use = 'gpt2'
-
-model_source = 'huggingface'
-
-print()
-print(f'Loading {model_to_use} from {model_source}')
-print()
-
-lm = ModelPack(model=model_to_use, source=model_source, model_args={'gpu': True})
-
 # Try to nudge the language model in a useful direction by
 # beginning the conversation w/ a prompt.
 conversation = [
@@ -205,8 +230,8 @@ skip_happiness_check = False
 while True:
     if not skip_happiness_check:
         print('===== Scores =====')
-        employee_a_scores, employee_a_feeling  = employee_a.get_happiness_score(lm, conversation, sia)
-        employee_b_scores, employee_b_feeling = employee_b.get_happiness_score(lm, conversation, sia)
+        employee_a_scores, employee_a_feeling  = employee_a.get_happiness_score(conversation, sia)
+        employee_b_scores, employee_b_feeling = employee_b.get_happiness_score(conversation, sia)
         print(f'{employee_a.name} feels {employee_a_feeling} ({employee_a_scores})')
         print(f'{employee_b.name} feels {employee_b_feeling} ({employee_b_scores})')
         print('==================')
@@ -242,38 +267,30 @@ while True:
         prompt_text += '\n'
         prompt_text += 'Who speaks next?'
 
-        next_speaker_out = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+        next_speaker_out = predict(prompt_text)
         
         next_to_speak = next_speaker_out["text"]
 
-        print(f'DEBUG: next_to_speak={next_to_speak}')
+        if DEBUG:
+            print(f'DEBUG: next_to_speak={next_to_speak}')
         
         if employee_a.first_name.lower() in next_to_speak.lower():
             # Prompt Employee A for next spoken dialog
             prompt_text = '\n'.join(conversation)
             prompt_text += '\n'
             prompt_text += f'{employee_a.first_name}: '
-            employee_a_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
-            employee_a_text = employee_a_output['text']
+            employee_a_text = predict(prompt_text)
             employee_a_text = ':'.join(employee_a_text.split(':')[1:]) # Trim first ABC: beginning of the line
-            if len(employee_a_text) < 2:
-                employee_a_text = employee_a_output['text'].strip()
-            #print(f'{employee_a.first_name}: {employee_a_text}')
-            #conversation.append(f'{employee_a.first_name}: {employee_a_text}')
         
         if employee_b.first_name.lower() in next_to_speak.lower():
             # Prompt Employee A for next spoken dialog
             prompt_text = '\n'.join(conversation)
             prompt_text += '\n'
             prompt_text += f'{employee_b.first_name}: '
-            employee_b_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
-            employee_b_text = employee_b_output['text']
+            employee_b_text = predict(prompt_text)
             employee_b_text = ':'.join(employee_b_text.split(':')[1:]) # Trim first ABC: beginning of the line
-            if len(employee_b_text) < 2:
-                employee_b_text = employee_b_output['text'].strip()
-            #print(f'{employee_b.first_name}: {employee_b_text}')
-            #conversation.append(f'{employee_b.first_name}: {employee_b_text}')
-        
+            
+
         # Now output stuff
         if employee_a.first_name.lower() in next_to_speak.lower():
             print(f'{employee_a.first_name}: {employee_a_text}')

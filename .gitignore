@@ -4,4 +4,6 @@ ai_models/*
 ai_models
 .py-packages/*
 .py-packages
+llm-server-folder/*
+llm-server-folder
 
