@@ -68,7 +68,7 @@ while True:
 
     for filename in os.listdir(llm_server_folder):
       if 'server-live-check.txt' in filename:
-        os.remove(filename)
+        os.remove( os.path.join(llm_server_folder, filename) )
         print('Server is alive!')
 
       elif 'predict.txt' in filename:
