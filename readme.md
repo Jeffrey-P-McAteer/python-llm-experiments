@@ -16,6 +16,11 @@ systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G  --user python manag
 
 /usr/bin/python /j/proj/python-llm-experiments/llm_server.py huggingface google/flan-t5-xl /j/proj/python-llm-experiments/llm-server-folder
 
+systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G  --user python llm_server.py huggingface google/flan-t5-xl /j/proj/python-llm-experiments/llm-server-folder
+
+
+systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G  --user python llm_server.py huggingface google/flan-t5-large /j/proj/python-llm-experiments/llm-server-folder
+
 
 ```
 
