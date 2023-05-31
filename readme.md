@@ -14,6 +14,7 @@ python managing_the_monsters.py [optional game nonce to re-play old games]
 
 systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G  --user python managing_the_monsters.py
 
+/usr/bin/python /j/proj/python-llm-experiments/llm_server.py huggingface google/flan-t5-xl /j/proj/python-llm-experiments/llm-server-folder
 
 
 ```
