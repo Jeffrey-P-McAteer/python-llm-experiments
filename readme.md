@@ -12,7 +12,7 @@ Running
 python managing_the_monsters.py [optional game nonce to re-play old games]
 
 
-systemd-run --scope -p MemoryHigh=9G -p MemorySwapMax=999G  --user python managing_the_monsters.py
+systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G  --user python managing_the_monsters.py
 
 
 

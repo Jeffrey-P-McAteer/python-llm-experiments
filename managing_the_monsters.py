@@ -64,7 +64,8 @@ try:
 except:
     traceback.print_exc()
     subprocess.run([
-        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'panml'
+        #sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'panml'
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'git+https://github.com/Pan-ML/panml.git'
     ])
     import panml
 
