@@ -68,38 +68,42 @@ if not os.path.exists(llm_server_folder):
     os.makedirs(llm_server_folder, exist_ok=True)
 
 # Ensure a server process is running by creating a file that the server always deletes.
-server_live_check_txt = os.path.join(llm_server_folder, 'server-live-check.txt')
-with open(server_live_check_txt, 'w') as fd:
-    fd.write('Test!')
+if not 'NOAUTOSPAWN' in os.environ:
+    print('NOAUTOSPAWN not in environ, checking if server is running...')
+    server_live_check_txt = os.path.join(llm_server_folder, 'server-live-check.txt')
+    with open(server_live_check_txt, 'w') as fd:
+        fd.write('Test!')
 
-# We expect the server to delete the file within 5 seconds, if it still exists we must launch llm_server.py
-for _ in range(0, 6*4):
-    time.sleep(1.0/4.0)
-    if not os.path.exists(server_live_check_txt):
-        break
+    # We expect the server to delete the file within 5 seconds, if it still exists we must launch llm_server.py
+    for _ in range(0, 6*4):
+        time.sleep(1.0/4.0)
+        if not os.path.exists(server_live_check_txt):
+            break
 
-if os.path.exists(server_live_check_txt):
-    # Spawn a server!
-    # See https://github.com/Pan-ML/panml/wiki/8.-Supported-models
-    model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
-    model_source = 'huggingface'
-    server_cmd_args = [
-        sys.executable, os.path.join(os.path.dirname(__file__), 'llm_server.py'),
-            model_source, model_to_use, llm_server_folder,
-    ]
-    print()
-    print('> ', ' '.join(server_cmd_args))
-    print()
+    if os.path.exists(server_live_check_txt):
+        # Spawn a server!
+        # See https://github.com/Pan-ML/panml/wiki/8.-Supported-models
+        model_to_use = 'google/flan-t5-xl' # 3b parameter model, uses maybe 12gb ram.
+        model_source = 'huggingface'
+        server_cmd_args = [
+            sys.executable, os.path.join(os.path.dirname(__file__), 'llm_server.py'),
+                model_source, model_to_use, llm_server_folder,
+        ]
+        print()
+        print('> ', ' '.join(server_cmd_args))
+        print()
 
-    subprocess.Popen(server_cmd_args)
+        subprocess.Popen(server_cmd_args)
 
-    # Also wait until it removes server-live-check.txt
-    print(f'Waiting for server to come up...')
-    while os.path.exists(server_live_check_txt):
-        time.sleep(2)
+        # Also wait until it removes server-live-check.txt
         print(f'Waiting for server to come up...')
-    print(f'Server is up!')
-
+        while os.path.exists(server_live_check_txt):
+            time.sleep(2)
+            print(f'Waiting for server to come up...')
+        print(f'Server is up!')
+else:
+    print('NOAUTOSPAWN in environ, continuing w/o checking if server process is running!')
+    
 
 def predict(text):
     predict_txt = os.path.join(llm_server_folder, 'predict.txt')
