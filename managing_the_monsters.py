@@ -300,6 +300,14 @@ while True:
         if employee_b.first_name.lower() in next_to_speak.lower():
             print(f'{employee_b.first_name}: {employee_b_text}')
             conversation.append(f'{employee_b.first_name}: {employee_b_text}')
+
+        # Repeat detection: if the last 3 conversation elements are the same, break!
+        if len(conversation) > 3:
+            last_three = conversation[-3:]
+            if len(set(last_three)) <= 1:
+                # They're all the same value!
+                print('>>> Loop detected, breaking conversation!')
+                break
     
 
 

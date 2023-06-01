@@ -71,5 +71,49 @@ Goodbye!
 ```
 
 
+```
+NOAUTOSPAWN=1 python managing_the_monsters.py 1685573583
+Using TRANSFORMERS_CACHE = /j/proj/python-llm-experiments/ai_models
+DEBUG = False
+[nltk_data] Downloading package vader_lexicon to /j/proj/python-llm-
+[nltk_data]     experiments/ai_models...
+[nltk_data]   Package vader_lexicon is already up-to-date!
+NOAUTOSPAWN in environ, continuing w/o checking if server process is running!
+game_seed = 1685573583
+Remember the game seed if you want to play the same game again by passing it as Arg1!
+MAX_GAME_TOKENS = 12500
+
+
+You are a manager and two employees with a problem have come into your office.
+Talk them through their problem until both employees are happy.
+
+Jessica Santiago is a 65-year-old female. Jessica is the Medical technical officer around here.
+
+Rebecca Simmons is a 43-year-old female. Rebecca is our Data processing manager around here.
+
+Jessica is putting day-old pizza boxes in the trash and not taking the trash out. Rebecca ends up always doing the work!
+
+===== Scores =====
+Jessica Santiago feels She is lazy.  ({'neg': 0.556, 'neu': 0.444, 'pos': 0.0, 'compound': -0.3612})
+Rebecca Simmons feels (ii).  ({'neg': 0.0, 'neu': 1.0, 'pos': 0.0, 'compound': 0.0})
+==================
+Manager> Jessica, please take out the trash next time you eat pizza. It will make Rebecca's life a lot easier!
+Rebecca:
+===== Scores =====
+Jessica Santiago feels Jessica feels bad about not taking out the trash.  ({'neg': 0.304, 'neu': 0.696, 'pos': 0.0, 'compound': -0.5423})
+Rebecca Simmons feels Rebecca feels annoyed.  ({'neg': 0.565, 'neu': 0.435, 'pos': 0.0, 'compound': -0.3818})
+==================
+Manager> Jessica I know you can do this! Rebecca you should be happy Jessica will be helping out!
+Rebecca:
+===== Scores =====
+Jessica Santiago feels Jessica is happy to help out.  ({'neg': 0.0, 'neu': 0.385, 'pos': 0.615, 'compound': 0.7506})
+Rebecca Simmons feels Rebecca is happy that Jessica will be helping out.  ({'neg': 0.0, 'neu': 0.543, 'pos': 0.457, 'compound': 0.7096})
+==================
+
+Success! You took 2.3333333333333335 steps to solve Jessica Santiago and Rebecca Simmons's problem!
+
+Goodbye!
+```
+
 
 
