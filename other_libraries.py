@@ -12,7 +12,7 @@ py_packages_folder = os.path.join(os.path.dirname(__file__), '.py-packages')
 if not os.path.exists(py_packages_folder):
     os.makedirs(py_packages_folder, exist_ok=True)
 sys.path.append(py_packages_folder)
-
+os.environ['PATH'] = os.environ['PATH']+os.pathsep+py_packages_folder
 
 if not 'TRANSFORMERS_CACHE' in os.environ:
     os.environ['TRANSFORMERS_CACHE'] = os.path.join(
@@ -35,7 +35,16 @@ if 'transformers' in sys.argv:
           sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'transformers'
       ])
       import transformers
-
+      
+  try:
+      import torch
+  except:
+      traceback.print_exc()
+      subprocess.run([
+          sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'torch', 'torchvision', 'torchaudio'
+      ])
+      import torch
+    
 
   print('='*8, 'Transformers Library', '='*8)
 
@@ -43,9 +52,11 @@ if 'transformers' in sys.argv:
 
   tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
   model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-  model.half().cuda()
+  #model.half().cuda()
+  #model.half()
 
-  inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
+  #inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
+  inputs = tokenizer("What's your mood today?", return_tensors="pt")
   tokens = model.generate(
     **inputs,
     max_new_tokens=128,
