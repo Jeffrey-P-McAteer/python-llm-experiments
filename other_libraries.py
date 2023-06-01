@@ -33,22 +33,22 @@ except:
     ])
     import transformers
 
-print('='*8, 'Transformers Library', '='*8)
+# print('='*8, 'Transformers Library', '='*8)
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
+# from transformers import AutoModelForCausalLM, AutoTokenizer
 
-tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-model.half().cuda()
+# tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
+# model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
+# model.half().cuda()
 
-inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
-tokens = model.generate(
-  **inputs,
-  max_new_tokens=128,
-  temperature=0.7,
-  do_sample=True,
-)
-print(tokenizer.decode(tokens[0], skip_special_tokens=True))
+# inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
+# tokens = model.generate(
+#   **inputs,
+#   max_new_tokens=128,
+#   temperature=0.7,
+#   do_sample=True,
+# )
+# print(tokenizer.decode(tokens[0], skip_special_tokens=True))
 
 
 print('='*8, 'LLM-RS Library', '='*8)
@@ -66,13 +66,15 @@ except:
 from llm_rs import AutoModel
 
 #Load the model, define any model you like from the list above as the `model_file`
-bloom_model_file = os.path.join(os.environ["TRANSFORMERS_CACHE"], 'bloom-3b-q4_0-ggjt.bin')
-if not os.path.exists(bloom_model_file):
-  print(f'Downloading {bloom_model_file}')
-  subprocess.run([
-    'wget', '-O', bloom_model_file, 'https://huggingface.co/rustformers/bloom-ggml/blob/main/bloom-3b-q4_0-ggjt.bin'
-  ])
-model = AutoModel.from_pretrained("rustformers/bloom-ggml", model_file=bloom_model_file)
+# bloom_model_file = os.path.join(os.environ["TRANSFORMERS_CACHE"], 'bloom-3b-q4_0-ggjt.bin')
+# if not os.path.exists(bloom_model_file):
+#   print(f'Downloading {bloom_model_file}')
+#   subprocess.run([
+#     'wget', '-O', bloom_model_file, 'https://huggingface.co/rustformers/bloom-ggml/blob/main/bloom-3b-q4_0-ggjt.bin'
+#   ])
+
+#model = AutoModel.from_pretrained("rustformers/bloom-ggml", model_file=bloom_model_file)
+model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0-ggjt.bin")
 
 #Generate
 print(model.generate("The meaning of life is"))
