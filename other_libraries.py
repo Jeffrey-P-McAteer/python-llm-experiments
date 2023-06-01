@@ -68,6 +68,16 @@ if 'transformers' in sys.argv:
 
 if 'llm-rs' in sys.argv or 'llmrs' in sys.argv or 'llm_rs' in sys.argv:
   print('='*8, 'LLM-RS Library', '='*8)
+  
+  try:
+      import accelerate
+  except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'accelerate'
+    ])
+    import accelerate
+    
   # See https://huggingface.co/rustformers/bloom-ggml
   try:
       import llm_rs
@@ -78,14 +88,23 @@ if 'llm-rs' in sys.argv or 'llmrs' in sys.argv or 'llm_rs' in sys.argv:
       ])
       import llm_rs
 
+  from llm_rs import AutoModel, GenerationConfig
 
-  from llm_rs import AutoModel
-
-  model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0-ggjt.bin")
+  #model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0-ggjt.bin")
+  #model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-f16.bin")
+  #model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0.bin")
+  model = AutoModel.from_pretrained("bigscience/bloom")
 
   #Generate
-  print(model.generate("The meaning of life is"))
+  # print(model.generate("The meaning of life is"))
 
+  generation_config = GenerationConfig(max_new_tokens=256)
+
+  print(model.generate("Sally has a coworker (Jack) who doesn't help the team. Sally can encourage Jack to be a better teammate by ", generation_config))
+
+  print(model.generate("A team of software developers goes out to lunch. John likes pizza, James likes subs, and Sally wants to eat pasta. Where should the team go for lunch?", generation_config))
+
+  print(model.generate("The sky has grey clouds in it. What will happen next?", generation_config))
 
 
 
