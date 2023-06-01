@@ -84,7 +84,8 @@ if 'llm-rs' in sys.argv or 'llmrs' in sys.argv or 'llm_rs' in sys.argv:
   except:
       traceback.print_exc()
       subprocess.run([
-          sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'llm-rs'
+          #sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'llm-rs'
+          sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'llm-rs', 'llm-rs[convert]'
       ])
       import llm_rs
 
