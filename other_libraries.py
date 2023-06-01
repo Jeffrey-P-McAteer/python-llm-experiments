@@ -26,7 +26,7 @@ os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
 
 
 if 'transformers' in sys.argv:
-  
+
   try:
       import transformers
   except:
@@ -70,15 +70,6 @@ if 'llm-rs' in sys.argv or 'llmrs' in sys.argv or 'llm_rs' in sys.argv:
 
   from llm_rs import AutoModel
 
-  #Load the model, define any model you like from the list above as the `model_file`
-  # bloom_model_file = os.path.join(os.environ["TRANSFORMERS_CACHE"], 'bloom-3b-q4_0-ggjt.bin')
-  # if not os.path.exists(bloom_model_file):
-  #   print(f'Downloading {bloom_model_file}')
-  #   subprocess.run([
-  #     'wget', '-O', bloom_model_file, 'https://huggingface.co/rustformers/bloom-ggml/blob/main/bloom-3b-q4_0-ggjt.bin'
-  #   ])
-
-  #model = AutoModel.from_pretrained("rustformers/bloom-ggml", model_file=bloom_model_file)
   model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0-ggjt.bin")
 
   #Generate
