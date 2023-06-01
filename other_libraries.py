@@ -24,60 +24,67 @@ print(f'Using TRANSFORMERS_CACHE = {os.environ["TRANSFORMERS_CACHE"]}')
 os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
 
 
-try:
-    import transformers
-except:
-    traceback.print_exc()
-    subprocess.run([
-        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'transformers'
-    ])
-    import transformers
 
-# print('='*8, 'Transformers Library', '='*8)
-
-# from transformers import AutoModelForCausalLM, AutoTokenizer
-
-# tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-# model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-# model.half().cuda()
-
-# inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
-# tokens = model.generate(
-#   **inputs,
-#   max_new_tokens=128,
-#   temperature=0.7,
-#   do_sample=True,
-# )
-# print(tokenizer.decode(tokens[0], skip_special_tokens=True))
+if 'transformers' in sys.argv:
+  
+  try:
+      import transformers
+  except:
+      traceback.print_exc()
+      subprocess.run([
+          sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'transformers'
+      ])
+      import transformers
 
 
-print('='*8, 'LLM-RS Library', '='*8)
-# See https://huggingface.co/rustformers/bloom-ggml
-try:
-    import llm_rs
-except:
-    traceback.print_exc()
-    subprocess.run([
-        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'llm-rs'
-    ])
-    import llm_rs
+  print('='*8, 'Transformers Library', '='*8)
+
+  from transformers import AutoModelForCausalLM, AutoTokenizer
+
+  tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
+  model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
+  model.half().cuda()
+
+  inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
+  tokens = model.generate(
+    **inputs,
+    max_new_tokens=128,
+    temperature=0.7,
+    do_sample=True,
+  )
+  print(tokenizer.decode(tokens[0], skip_special_tokens=True))
 
 
-from llm_rs import AutoModel
+if 'llm-rs' in sys.argv or 'llmrs' in sys.argv or 'llm_rs' in sys.argv:
+  print('='*8, 'LLM-RS Library', '='*8)
+  # See https://huggingface.co/rustformers/bloom-ggml
+  try:
+      import llm_rs
+  except:
+      traceback.print_exc()
+      subprocess.run([
+          sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'llm-rs'
+      ])
+      import llm_rs
 
-#Load the model, define any model you like from the list above as the `model_file`
-# bloom_model_file = os.path.join(os.environ["TRANSFORMERS_CACHE"], 'bloom-3b-q4_0-ggjt.bin')
-# if not os.path.exists(bloom_model_file):
-#   print(f'Downloading {bloom_model_file}')
-#   subprocess.run([
-#     'wget', '-O', bloom_model_file, 'https://huggingface.co/rustformers/bloom-ggml/blob/main/bloom-3b-q4_0-ggjt.bin'
-#   ])
 
-#model = AutoModel.from_pretrained("rustformers/bloom-ggml", model_file=bloom_model_file)
-model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0-ggjt.bin")
+  from llm_rs import AutoModel
 
-#Generate
-print(model.generate("The meaning of life is"))
+  #Load the model, define any model you like from the list above as the `model_file`
+  # bloom_model_file = os.path.join(os.environ["TRANSFORMERS_CACHE"], 'bloom-3b-q4_0-ggjt.bin')
+  # if not os.path.exists(bloom_model_file):
+  #   print(f'Downloading {bloom_model_file}')
+  #   subprocess.run([
+  #     'wget', '-O', bloom_model_file, 'https://huggingface.co/rustformers/bloom-ggml/blob/main/bloom-3b-q4_0-ggjt.bin'
+  #   ])
+
+  #model = AutoModel.from_pretrained("rustformers/bloom-ggml", model_file=bloom_model_file)
+  model = AutoModel.from_pretrained("rustformers/bloom-ggml",model_file="bloom-3b-q4_0-ggjt.bin")
+
+  #Generate
+  print(model.generate("The meaning of life is"))
+
+
 
 
 
