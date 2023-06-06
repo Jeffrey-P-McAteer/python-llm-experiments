@@ -68,7 +68,13 @@ while True:
 
     for filename in os.listdir(llm_server_folder):
       if 'server-live-check.txt' in filename:
-        os.remove( os.path.join(llm_server_folder, filename) )
+        while os.path.exists( os.path.join(llm_server_folder, filename) ):
+          time.sleep(0.1)
+          try:
+             os.remove( os.path.join(llm_server_folder, filename) )
+             break
+          except:
+             pass
         print('Server is alive!')
 
       elif 'predict.txt' in filename:
@@ -90,7 +96,13 @@ while True:
           print(f'> {response_line}')
         print()
 
-        os.remove( os.path.join(llm_server_folder, filename) )
+        while os.path.exists( os.path.join(llm_server_folder, filename) ):
+           time.sleep(0.1)
+           try:
+              os.remove( os.path.join(llm_server_folder, filename) )
+              break
+           except:
+              pass
 
   except:
     traceback.print_exc()

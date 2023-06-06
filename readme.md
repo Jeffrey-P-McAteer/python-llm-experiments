@@ -22,6 +22,10 @@ systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G --nice=2 --user pyth
 systemd-run --scope -p MemoryHigh=12G -p MemorySwapMax=999G --nice=2 --user python llm_server.py huggingface google/flan-t5-large /j/proj/python-llm-experiments/llm-server-folder
 
 
+C:\Temp\procgov\procgov64.exe --minws 100M --maxws 6000M "C:\Program Files\Python311\python.exe" llm_server.py huggingface google/flan-t5-xl llm-server-folder
+
+& "C:\Program Files\Python311\python.exe" managing_the_monsters.py
+
 ```
 
 ## Example games

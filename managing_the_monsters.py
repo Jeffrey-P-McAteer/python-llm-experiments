@@ -63,7 +63,7 @@ import nltk
 nltk.download('vader_lexicon', download_dir=os.environ["TRANSFORMERS_CACHE"])
 nltk.data.path.append(os.environ["TRANSFORMERS_CACHE"])
 
-llm_server_folder = os.path.join(os.path.dirname(__file__), 'llm-server-folder')
+llm_server_folder = os.environ.get('LLM_SERVER_FOLDER', os.path.join(os.path.dirname(__file__), 'llm-server-folder') )
 if not os.path.exists(llm_server_folder):
     os.makedirs(llm_server_folder, exist_ok=True)
 
@@ -98,7 +98,7 @@ if not 'NOAUTOSPAWN' in os.environ:
         # Also wait until it removes server-live-check.txt
         print(f'Waiting for server to come up...')
         while os.path.exists(server_live_check_txt):
-            time.sleep(2)
+            time.sleep(1)
             print(f'Waiting for server to come up...')
         print(f'Server is up!')
 else:
@@ -113,16 +113,34 @@ def predict(text):
     response_txt = os.path.join(llm_server_folder, 'response.txt')
     while not os.path.exists(response_txt):
         time.sleep(0.1)
+    time.sleep(0.1)
 
     response_s = ''
-    with open(response_txt, 'r') as fd:
-        response_s = fd.read()
-        if not isinstance(response_s, str):
-            response_s = response_s.decode('utf-8')
+    for _ in range(0, 100): # Poll file for up to 10s for a non-empty response string
+        with open(response_txt, 'r') as fd:
+            response_s = fd.read()
+            if not isinstance(response_s, str):
+                response_s = response_s.decode('utf-8')
+        if len(response_s) > 0:
+            break
+        else:
+            time.sleep(0.1)
 
-    os.remove(response_txt)
-    if os.path.exists(predict_txt):
-        os.remove(predict_txt)
+    while os.path.exists(response_txt):
+        time.sleep(0.1)
+        try:
+            os.remove(response_txt)
+            break
+        except:
+            pass
+
+    while os.path.exists(predict_txt):
+        time.sleep(0.1)
+        try:
+            os.remove(predict_txt)
+            break
+        except:
+            pass
 
     return response_s
 
@@ -265,7 +283,11 @@ while True:
     # Now ask the AI model who speaks next, and continue prompting for employee_a.first_name / employee_b.first_name
     # until "Manager" is selected as the next speaker.
     next_to_speak = ''
+    remaining_employee_messages = 8 # if we have more than 8 back-and-forths between employee agents, the manager interrupts.
     while not 'manager' in next_to_speak.lower():
+
+        remaining_employee_messages -= 1
+
         prompt_text = '\n'.join(conversation)
         prompt_text += '\n'
         prompt_text += 'Who speaks next?'
@@ -302,7 +324,7 @@ while True:
             conversation.append(f'{employee_b.first_name}: {employee_b_text}')
 
         # Repeat detection: if the last 3 conversation elements are the same, break!
-        if len(conversation) > 3:
+        if len(conversation) > 3 or remaining_employee_messages < 1:
             last_three = conversation[-3:]
             if len(set(last_three)) <= 1:
                 # They're all the same value!
