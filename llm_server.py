@@ -84,7 +84,10 @@ while True:
           if not isinstance(prompt_text, str):
             prompt_text = prompt_text.decode('utf-8')
 
+        #lm_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS, temperature=0.95)
         lm_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
+
+        print(f'DEBUG lm_output={lm_output}')
 
         with open(os.path.join(llm_server_folder, 'response.txt'), 'w') as fd:
           fd.write(lm_output['text'])

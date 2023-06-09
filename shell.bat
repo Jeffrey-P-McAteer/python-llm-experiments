@@ -8,4 +8,5 @@ echo "Assuming PYTHON_BIN_DIR=%PYTHON_BIN_DIR%"
 
 set PATH=%R_BIN_DIR%;%PYTHON_BIN_DIR%;%PATH%
 
-cmd
+:: cmd
+powershell

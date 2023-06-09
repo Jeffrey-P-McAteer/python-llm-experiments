@@ -207,14 +207,15 @@ class Employee():
 fake = Faker()
 fake.seed_instance(game_seed)
 
-employee_a = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is the {job} around here.')
-employee_b = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is our {job} around here.')
+employee_a = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is a {job} around here.')
+employee_b = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is a {job} around here.')
 
 
 problems = [
     '{a.first_name} decided to throw a party after work and did not invite {b.first_name}. {b.first_name} feels left out.',
     '{a.first_name} is putting day-old pizza boxes in the trash and not taking the trash out. {b.first_name} ends up always doing the work!',
     '{a.first_name} has ruined {b.first_name}\'s project!',
+    '{a.first_name} and {b.first_name} have been avoiding eachother for some time. We need to get the team back together to handle new work that\'s coming in!',
 ]
 
 game_problem = random.choice(problems).format(
@@ -258,7 +259,7 @@ while True:
         print('==================')
 
         at_least_one_is_unhappy = employee_a_scores.get('neg', 0.0) > 0.1 or employee_b_scores.get('neg', 0.0) > 0.1
-        at_least_one_is_mildly_happy = employee_a_scores.get('pos', 0.0) > 0.3 or employee_b_scores.get('pos', 0.0) > 0.3
+        at_least_one_is_mildly_happy = employee_a_scores.get('pos', 0.0) > 0.3 or employee_b_scores.get('pos', 0.0) > 0.16
         
         if not at_least_one_is_unhappy and at_least_one_is_mildly_happy:
             print()
@@ -326,7 +327,7 @@ while True:
         # Repeat detection: if the last 3 conversation elements are the same, break!
         if len(conversation) > 3 or remaining_employee_messages < 1:
             last_three = conversation[-3:]
-            if len(set(last_three)) <= 1:
+            if len(set(last_three)) <= 1 or remaining_employee_messages < 1:
                 # They're all the same value!
                 print('>>> Loop detected, breaking conversation!')
                 break
