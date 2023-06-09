@@ -172,6 +172,13 @@ class Employee():
             self.gender = random.choice(['male', 'female'])
         self.gender = self.gender.replace('mostly_', '')
         self.gender = self.gender.replace('half_', '')
+
+        if 'male' in self.gender:
+            self.subject_pronoun = 'he'
+            self.object_pronoun = 'him'
+        else:
+            self.subject_pronoun = 'she'
+            self.object_pronoun = 'her'
         
         self.age = random.randint(18, 72)
 
@@ -204,6 +211,56 @@ class Employee():
     def get_description(self):
         return self.employee_description
 
+class PublicComment:
+    def __init__(self, comment):
+        self.comment = comment
+
+class PrivateComment:
+    def __init__(self, comment):
+        self.comment = comment
+
+class GameScene:
+    def __init__(self, public_problem_format_s, private_problem_format_s, employee_a, employee_b):
+        self.public_problem_format_s = public_problem_format_s
+        self.private_problem_format_s = private_problem_format_s
+        self.employee_a = employee_a
+        self.employee_b = employee_b
+        # Holds objects of type PublicComment or PrivateComment.
+        # PrivateComment is not known to the player (manager).
+        self.conversation = [
+            PublicComment(public_problem_format_s.format(a=self.employee_a, b=self.employee_b)),
+            PrivateComment(private_problem_format_s.format(a=self.employee_a, b=self.employee_b)),
+        ]
+    
+    def get_entire_conversation(self):
+        entire_convo_text = []
+        for entry in self.conversation:
+            entire_convo_text.append(entry.comment)
+        return entire_convo_text
+
+    def get_public_conversation(self):
+        pub_convo_text = []
+        for entry in self.conversation:
+            if isinstance(entry, PublicComment):
+                pub_convo_text.append(entry.comment)
+        return pub_convo_text
+
+    def add_to_conversation(self, comment):
+        if not isinstance(comment, str):
+            comment = str(comment)
+        # If the comment is >75% either a or b's first_name, do not add it.
+        comment_wo_usernames = (comment.lower()
+                                      .replace(self.employee_a.first_name.lower(), '')
+                                      .replace(self.employee_b.first_name.lower(), '') )
+        
+        # if the words w/o usernames are <= 25% of comment then the comment was >75% names
+        if len(comment_wo_usernames) < len(comment) * 0.25:
+            return
+
+        self.conversation.append(PublicComment( comment.strip() ))
+
+
+
 fake = Faker()
 fake.seed_instance(game_seed)
 
@@ -211,17 +268,36 @@ employee_a = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} i
 employee_b = Employee(fake, '{name} is a {age}-year-old {gender}. {first_name} is a {job} around here.')
 
 
+# Fun new approach - some of the conversation/background is hidden from the player!
 problems = [
-    '{a.first_name} decided to throw a party after work and did not invite {b.first_name}. {b.first_name} feels left out.',
-    '{a.first_name} is putting day-old pizza boxes in the trash and not taking the trash out. {b.first_name} ends up always doing the work!',
-    '{a.first_name} has ruined {b.first_name}\'s project!',
-    '{a.first_name} and {b.first_name} have been avoiding eachother for some time. We need to get the team back together to handle new work that\'s coming in!',
+    GameScene(
+        '{a.first_name} decided to throw a party after work and did not invite {b.first_name}. {b.first_name} feels left out.',
+        ' '.join([
+            '{b.first_name} feels sad because people in the office have been unfairly making fun of {b.object_pronoun}.'
+            '{a.first_name} does not want to admit it but they secretly hate {b.first_name} because of the rumours around the office.'
+        ]),
+        employee_a, employee_b,
+    ),
+    GameScene(
+        '{a.first_name} decided to throw a party after work and did not invite {b.first_name}. {b.first_name} feels left out.',
+        ' '.join([
+            '{b.first_name} is very busy and can never find the free time to participate in social events, but does not want anyone to know they are so busy.',
+            '{a.first_name} has been trying to invite {b.first_name} to their parties, but {b.first_name} seems to never get back to them.'
+        ]),
+        employee_a, employee_b,
+    ),
+    GameScene(
+        '{a.first_name} has ruined {b.first_name}\'s project!',
+        ' '.join([
+            '{b.first_name} was working for months to build a useful tool and had asked {a.first_name} for help. {b.subject_pronoun} knows {a.first_name} is talented and can help with the project.',
+            '{a.first_name} was trying to help but a part broke during construction. {a.first_name} is afraid they will be ridiculed if anyone finds out about the broken part!'
+        ]),
+        employee_a, employee_b,
+    ),
 ]
 
-game_problem = random.choice(problems).format(
-    a=employee_a,
-    b=employee_b
-)
+game_problem = random.choice(problems)
+
 
 
 print()
@@ -234,26 +310,19 @@ print(employee_a.get_description())
 print()
 print(employee_b.get_description())
 print()
-print(game_problem)
+for line in game_problem.get_public_conversation():
+    print(line)
 print()
 
-# Try to nudge the language model in a useful direction by
-# beginning the conversation w/ a prompt.
-conversation = [
-    employee_a.get_description(),
-    employee_b.get_description(),
-    game_problem
-]
-
 sia = SentimentIntensityAnalyzer()
-
 skip_happiness_check = False
+num_manager_steps = 0
 
 while True:
     if not skip_happiness_check:
         print('===== Scores =====')
-        employee_a_scores, employee_a_feeling  = employee_a.get_happiness_score(conversation, sia)
-        employee_b_scores, employee_b_feeling = employee_b.get_happiness_score(conversation, sia)
+        employee_a_scores, employee_a_feeling  = employee_a.get_happiness_score(game_problem.get_entire_conversation(), sia)
+        employee_b_scores, employee_b_feeling = employee_b.get_happiness_score(game_problem.get_entire_conversation(), sia)
         print(f'{employee_a.name} feels {employee_a_feeling} ({employee_a_scores})')
         print(f'{employee_b.name} feels {employee_b_feeling} ({employee_b_scores})')
         print('==================')
@@ -263,7 +332,7 @@ while True:
         
         if not at_least_one_is_unhappy and at_least_one_is_mildly_happy:
             print()
-            print(f'Success! You took {len(conversation) / 3} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
+            print(f'Success! You took {num_manager_steps} steps to solve {employee_a.name} and {employee_b.name}\'s problem!')
             print()
             break
     
@@ -279,17 +348,18 @@ while True:
         skip_happiness_check = True # Same game state
         continue
     
-    conversation.append(f'Manager: {user_input}')
+    num_manager_steps += 1
+    game_problem.add_to_conversation(f'Manager: {user_input}')
 
     # Now ask the AI model who speaks next, and continue prompting for employee_a.first_name / employee_b.first_name
     # until "Manager" is selected as the next speaker.
     next_to_speak = ''
-    remaining_employee_messages = 8 # if we have more than 8 back-and-forths between employee agents, the manager interrupts.
+    remaining_employee_messages = 7 # if we have more than 7 back-and-forths between employee agents, the manager interrupts.
     while not 'manager' in next_to_speak.lower():
 
         remaining_employee_messages -= 1
 
-        prompt_text = '\n'.join(conversation)
+        prompt_text = '\n'.join(game_problem.get_entire_conversation())
         prompt_text += '\n'
         prompt_text += 'Who speaks next?'
 
@@ -300,7 +370,7 @@ while True:
         
         if employee_a.first_name.lower() in next_to_speak.lower():
             # Prompt Employee A for next spoken dialog
-            prompt_text = '\n'.join(conversation)
+            prompt_text = '\n'.join(game_problem.get_entire_conversation())
             prompt_text += '\n'
             prompt_text += f'{employee_a.first_name}: '
             employee_a_text = predict(prompt_text)
@@ -308,7 +378,7 @@ while True:
         
         if employee_b.first_name.lower() in next_to_speak.lower():
             # Prompt Employee A for next spoken dialog
-            prompt_text = '\n'.join(conversation)
+            prompt_text = '\n'.join(game_problem.get_entire_conversation())
             prompt_text += '\n'
             prompt_text += f'{employee_b.first_name}: '
             employee_b_text = predict(prompt_text)
@@ -318,20 +388,20 @@ while True:
         # Now output stuff
         if employee_a.first_name.lower() in next_to_speak.lower():
             print(f'{employee_a.first_name}: {employee_a_text}')
-            conversation.append(f'{employee_a.first_name}: {employee_a_text}')
+            game_problem.add_to_conversation(f'{employee_a.first_name}: {employee_a_text}')
         
         if employee_b.first_name.lower() in next_to_speak.lower():
             print(f'{employee_b.first_name}: {employee_b_text}')
-            conversation.append(f'{employee_b.first_name}: {employee_b_text}')
+            game_problem.add_to_conversation(f'{employee_b.first_name}: {employee_b_text}')
 
         # Repeat detection: if the last 3 conversation elements are the same, break!
-        if len(conversation) > 3 or remaining_employee_messages < 1:
-            last_three = conversation[-3:]
+        if len(game_problem.get_entire_conversation()) > 3 or remaining_employee_messages < 1:
+            last_three = game_problem.get_entire_conversation()[-3:]
             if len(set(last_three)) <= 1 or remaining_employee_messages < 1:
                 # They're all the same value!
                 print('>>> Loop detected, breaking conversation!')
                 break
-    
+
 
 
 print('Goodbye!')
