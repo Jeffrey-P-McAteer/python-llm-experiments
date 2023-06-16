@@ -89,6 +89,7 @@ if not 'NOAUTOSPAWN' in os.environ:
             sys.executable, os.path.join(os.path.dirname(__file__), 'llm_server.py'),
                 model_source, model_to_use, llm_server_folder,
         ]
+        # python3.10 llm_server.py huggingface google/flan-t5-xxl ./llm-server-folder/
         print()
         print('> ', ' '.join(server_cmd_args))
         print()
