@@ -87,7 +87,8 @@ while True:
         #lm_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS, temperature=0.95)
         lm_output = lm.predict(prompt_text, max_length=MAX_GAME_TOKENS)
 
-        print(f'DEBUG lm_output={lm_output}')
+        if DEBUG:
+          print(f'DEBUG lm_output={lm_output}')
 
         with open(os.path.join(llm_server_folder, 'response.txt'), 'w') as fd:
           fd.write(lm_output['text'])
