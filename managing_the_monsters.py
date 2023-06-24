@@ -94,7 +94,11 @@ if not 'NOAUTOSPAWN' in os.environ:
         print('> ', ' '.join(server_cmd_args))
         print()
 
-        subprocess.Popen(server_cmd_args)
+        if DEBUG:
+            subprocess.Popen(server_cmd_args)
+        else:
+            # Ensure server is silent
+            subprocess.Popen(server_cmd_args, stdin=subprocess.STDOUT, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT)
 
         # Also wait until it removes server-live-check.txt
         print(f'Waiting for server to come up...')
