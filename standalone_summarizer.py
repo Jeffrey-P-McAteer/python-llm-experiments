@@ -72,6 +72,7 @@ Usage:
     Uses the MODEL_NAME llm model to summarize TEXT_TO_SUMMARIZE
 
 '''.strip())
+    return
 
   huggingface_model = 'bigscience/bloomz-7b1'
   text_to_summarize = ''
