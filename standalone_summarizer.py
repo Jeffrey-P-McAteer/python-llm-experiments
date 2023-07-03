@@ -97,8 +97,8 @@ Usage:
   lm = ModelPack(model=huggingface_model, source='huggingface', model_args={'gpu': True})
 
   prompt_text = text_to_summarize
-  prompt_text += '\n'
-  prompt_text += 'Summarize the above text.'
+  # prompt_text += '\n'
+  # prompt_text += 'Summarize the above text.'
 
   lm_output = lm.predict(prompt_text, max_length=int(len(text_to_summarize) * 5))
 
