@@ -108,6 +108,59 @@ if 'llm-rs' in sys.argv or 'llmrs' in sys.argv or 'llm_rs' in sys.argv:
   print(model.generate("The sky has grey clouds in it. What will happen next?", generation_config))
 
 
+if 'agency' in sys.argv:
+  print('='*8, 'Agency Library', '='*8)
+  
+  try:
+    import agency
+  except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', f'--target={py_packages_folder}', 'agency'
+    ])
+    import agency
+
+  from agency import *
+  from agency.space import *
+  from agency.spaces.web_app import *
+  from agency.agents.chattyai import *
+  from agency.agents.host import *
+
+
+  space = Space("DemoSpace") 
+
+  space.add(
+        WebApp("WebApp",
+            demo_user_id="Dan", # hardcoded for simplicity
+            port='8080'))
+
+  space.add(
+        ChattyAI("Chatty",
+            model="EleutherAI/gpt-neo-125m"))
+
+  space.add(
+        Host("Host"))
+
+#space.add(
+#    OpenAIFunctionAgent("FunctionAI",
+#        model="gpt-3.5-turbo-16k",
+#        openai_api_key=os.getenv("OPENAI_API_KEY"),
+#        # user_id determines the "user" role in the OpenAI chat
+    #       user_id="Dan.WebApp.DemoSpace"))
+
+#space.add(
+#    OpenAICompletionAgent("CompletionAI",
+#        model="text-davinci-003",
+#        openai_api_key=os.getenv("OPENAI_API_KEY")))
+
+  space.run()
+
+  print("pop!")
+
+  # keep alive
+  while True:
+    time.sleep(1)
+
 
 
 
