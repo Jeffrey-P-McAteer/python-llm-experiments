@@ -100,7 +100,8 @@ Usage:
   # prompt_text += '\n'
   # prompt_text += 'Summarize the above text.'
 
-  lm_output = lm.predict(prompt_text, max_length=int(len(text_to_summarize) * 5))
+  #lm_output = lm.predict(prompt_text, max_length=int(len(text_to_summarize) * 5))
+  lm_output = lm.predict(prompt_text, max_length=16 * 1024)
 
   if isinstance(lm_output, dict) and 'text' in lm_output:
     lm_output = lm_output['text']
