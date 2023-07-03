@@ -14,10 +14,24 @@ sys.path.append(py_packages_folder)
 
 # Tell panml/transformers where to put models b/c sometimes we want them on an external disk.
 if not 'TRANSFORMERS_CACHE' in os.environ:
-    os.environ['TRANSFORMERS_CACHE'] = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        'ai_models'
-    )
+    preferred_transformers_cache_folders = [
+      # Jeff's external USB SSD
+      '/mnt/ai-models',
+      # Current working directory + ai_models folder
+      os.path.join(
+          os.path.dirname(os.path.realpath(__file__)),
+          'ai_models'
+      ),
+      # TODO ???
+    ]
+    for preferred_dir in preferred_transformers_cache_folders:
+      print(f'Checking if {preferred_dir} exists...')
+      if os.path.exists(preferred_dir):
+        os.environ['TRANSFORMERS_CACHE'] = preferred_dir
+        break
+    # Otherwise pick the last one even if it does not exist
+    if not 'TRANSFORMERS_CACHE' in os.environ or not os.path.exists(os.environ['TRANSFORMERS_CACHE']):
+      os.environ['TRANSFORMERS_CACHE'] = preferred_transformers_cache_folders[-1]
 
 print(f'Using TRANSFORMERS_CACHE = {os.environ["TRANSFORMERS_CACHE"]}')
 os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
