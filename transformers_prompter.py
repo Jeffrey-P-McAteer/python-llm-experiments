@@ -49,32 +49,23 @@ except:
 
 
 # model_name = 'bigscience/bloom'
-model_name = 'gpt2'
+# model_name = 'gpt2'
+model_name = 'lmsys/longchat-13b-16k'
 
 print(f'Loading model {model_name}')
 
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+cuda_dev_num = 0
+print(f'Using CUDA device: {torch.cuda.get_device_name(cuda_dev_num)}')
+print(f'num_workers = {os.cpu_count()}')
 
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    device_map='auto',
-    torch_dtype='auto'
+generator = pipeline(
+        model=model_name,
+        # tokenizer=tokenizer,
+        num_workers=os.cpu_count(),
+        device=cuda_dev_num
 )
 
 try:
-    #print(f'tokenizer = {tokenizer}')
-    #print(f'model = {model}')
-    cuda_dev_num = 0
-    print(f'Using CUDA device: {torch.cuda.get_device_name(cuda_dev_num)}')
-    print(f'num_workers = {os.cpu_count()}')
-
-    generator = pipeline(
-            model=model_name,
-            tokenizer=tokenizer,
-            num_workers=os.cpu_count(),
-            device=cuda_dev_num
-    )
-
     print(f'generator = {generator}')
     print(f'{generator("Hello user, my name is", max_new_tokens=200)}')
 except:
