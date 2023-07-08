@@ -66,6 +66,16 @@ try:
 except:
     traceback.print_exc()
 
+print('''
+# 
+# Run text generation like:
+#     generator('Hello, my name is')
+# 
+# Args for generator's __call__ are documented at https://huggingface.co/docs/transformers/main/en/main_classes/pipelines#transformers.TextGenerationPipeline.__call__
+#
+#
+'''.strip())
+
 vars = globals()
 vars.update(locals())
 code.interact(local=vars)
