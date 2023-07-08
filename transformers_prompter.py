@@ -18,6 +18,17 @@ os.makedirs(runner_env, exist_ok=True)
 print('Putting python libs in ', runner_env)
 sys.path.append(runner_env)
 
+
+try:
+    import torch
+except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', f'--target={runner_env}', 'torch', 'torchvision', 'torchaudio', '--index-url', 'https://download.pytorch.org/whl/cu118'
+    ])
+    import torch
+
+
 try:
     from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 except:
@@ -26,15 +37,6 @@ except:
         sys.executable, '-m', 'pip', 'install', f'--target={runner_env}', 'transformers[torch]'
     ])
     from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-
-try:
-    import torch
-except:
-    traceback.print_exc()
-    subprocess.run([
-        sys.executable, '-m', 'pip', 'install', f'--target={runner_env}', 'torch', 'torchvision', 'torchaudio', '--index-url https://download.pytorch.org/whl/cu118'
-    ])
-    import torch
 
 
 # model_name = 'bigscience/bloom'
@@ -51,16 +53,21 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 
 try:
-    print(f'tokenizer = {tokenizer}')
-    print(f'model = {model}')
+    #print(f'tokenizer = {tokenizer}')
+    #print(f'model = {model}')
     cuda_dev_num = 0
     print(f'Using CUDA device: {torch.cuda.get_device_name(cuda_dev_num)}')
+    cuda_dev_o = torch.cuda.device(cuda_dev_num)
+    print(f'cuda_dev_o = {cuda_dev_o}')
+    print(f'num_workers = {os.cpu_count()}')
+
     generator = pipeline(
-            model=model,
+            model=model_name,
             tokenizer=tokenizer,
-            num_workers=24,
-            device=torch.cuda.device(cuda_dev_num)
+            num_workers=os.cpu_count(),
+            device=cuda_dev_o
     )
+
     print(f'generator = {generator}')
     print(f'{generator("Hello user, my name is", do_sample=False)}')
 except:
