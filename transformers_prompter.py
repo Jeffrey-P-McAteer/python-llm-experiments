@@ -57,8 +57,6 @@ try:
     #print(f'model = {model}')
     cuda_dev_num = 0
     print(f'Using CUDA device: {torch.cuda.get_device_name(cuda_dev_num)}')
-    cuda_dev_o = torch.cuda.device(cuda_dev_num)
-    print(f'cuda_dev_o = {cuda_dev_o}')
     print(f'num_workers = {os.cpu_count()}')
 
     generator = pipeline(
