@@ -3,7 +3,7 @@
 #
 #   python transformers_prompter.py gpt2 text-generation
 #   python transformers_prompter.py deepset/roberta-base-squad2 question-answering
-#   python transformers_prompter.py tuner007/pegasus_summarizer summarization
+#   python transformers_prompter.py hadiqaemi/t5-github-readme-summarizer summarization
 #
 # Ensure your model supports the task!
 #
@@ -149,7 +149,7 @@ To learn more about how 3-phase power works and the benefits it brings, visit: h
     elif task == 'question-answering':
         print(f'>>> What delivers more power? >>> {generator(context=three_phase_power_article_text, question="What delivers more power?", max_new_tokens=200)}')
     elif task == 'summarization':
-        print(f'>>> {generator(three_phase_power_article_text, min_length=10, max_length=35)}')
+        print(f'>>> {generator(three_phase_power_article_text, min_length=10, max_length=50)}')
 except:
     traceback.print_exc()
 
@@ -158,7 +158,7 @@ print('''
 # Run text generation/model prompting (see task types) like:
 #   text-generation:    generator('Hello, my name is', max_new_tokens=200)
 #   question-answering: generator(context="The sky has been a few different colors lately, ranging from red to blue. Yesterday the sky was red. Today the sky is bluer.", question="What color is the sky?", max_new_tokens=200)
-#   summarization:      generator(long_article_text, min_length=10, max_length=35)
+#   summarization:      generator(long_article_text, min_length=10, max_length=50)
 # 
 # Args for generator's __call__ are documented at https://huggingface.co/docs/transformers/main/en/main_classes/pipelines#transformers.TextGenerationPipeline.__call__
 #
