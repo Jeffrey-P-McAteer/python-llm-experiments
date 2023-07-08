@@ -1,5 +1,13 @@
 
-# Managing the Monsters
+# LLM-Experiments
+
+Playground of various LLM nonsense.
+
+
+
+
+
+## Managing the Monsters
 
 _a workplace chaos game_
 
