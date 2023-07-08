@@ -60,7 +60,6 @@ print(f'num_workers = {os.cpu_count()}')
 
 generator = pipeline(
         model=model_name,
-        # tokenizer=tokenizer,
         num_workers=os.cpu_count(),
         device=cuda_dev_num
 )
