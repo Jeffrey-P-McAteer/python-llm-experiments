@@ -6,4 +6,8 @@ ai_models
 .py-packages
 llm-server-folder/*
 llm-server-folder
+transformers_cache/*
+transformers_cache
+runner_env
+runner_env/*
 
