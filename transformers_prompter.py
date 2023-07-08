@@ -67,14 +67,14 @@ try:
     )
 
     print(f'generator = {generator}')
-    print(f'{generator("Hello user, my name is", do_sample=False)}')
+    print(f'{generator("Hello user, my name is", max_new_tokens=200)}')
 except:
     traceback.print_exc()
 
 print('''
 # 
 # Run text generation like:
-#     generator('Hello, my name is')
+#     generator('Hello, my name is', max_new_tokens=200)
 # 
 # Args for generator's __call__ are documented at https://huggingface.co/docs/transformers/main/en/main_classes/pipelines#transformers.TextGenerationPipeline.__call__
 #
