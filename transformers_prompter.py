@@ -5,6 +5,8 @@
 #   python transformers_prompter.py deepset/roberta-base-squad2 question-answering
 #   python transformers_prompter.py hadiqaemi/t5-github-readme-summarizer summarization
 #
+#   python transformers_prompter.py bigscience/bloom text-generation
+#
 # Ensure your model supports the task!
 #
 
