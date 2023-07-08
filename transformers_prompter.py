@@ -27,6 +27,16 @@ except:
     ])
     from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
+try:
+    import torch
+except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', f'--target={runner_env}', 'torch', 'torchvision', 'torchaudio', '--index-url https://download.pytorch.org/whl/cu118'
+    ])
+    import torch
+
+
 # model_name = 'bigscience/bloom'
 model_name = 'gpt2'
 
