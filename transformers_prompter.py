@@ -50,7 +50,7 @@ except:
 
 # model_name = 'bigscience/bloom'
 # model_name = 'gpt2'
-model_name = 'lmsys/longchat-13b-16k'
+model_name = 'lmsys/longchat-13b-16k' if len(sys.argv) < 2 else sys.argv[1]
 
 print(f'Loading model {model_name}')
 
