@@ -65,7 +65,7 @@ try:
             model=model_name,
             tokenizer=tokenizer,
             num_workers=os.cpu_count(),
-            device=cuda_dev_o
+            device=cuda_dev_num
     )
 
     print(f'generator = {generator}')
