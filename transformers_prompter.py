@@ -38,6 +38,15 @@ except:
     ])
     from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
+try:
+    import xformers
+except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', f'--target={runner_env}', 'xformers'
+    ])
+    import xformers
+
 
 # model_name = 'bigscience/bloom'
 model_name = 'gpt2'
