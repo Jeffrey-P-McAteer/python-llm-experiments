@@ -79,7 +79,8 @@ generator = pipeline(
         task=task,
         model=model_name,
         num_workers=os.cpu_count(),
-        device=cuda_dev_num
+        device=cuda_dev_num,
+        trust_remote_code=True
 )
 
 try:
