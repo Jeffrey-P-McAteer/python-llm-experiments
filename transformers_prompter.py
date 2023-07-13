@@ -59,6 +59,14 @@ except:
     ])
     import xformers
 
+try:
+    import better_profanity
+except:
+    traceback.print_exc()
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install', f'--target={runner_env}', 'better_profanity'
+    ])
+    import better_profanity
 
 # model_name = 'bigscience/bloom'
 # model_name = 'gpt2'
