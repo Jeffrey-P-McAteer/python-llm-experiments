@@ -42,7 +42,7 @@ except:
   # See perf tuning env var DTYPE=float16 vs bfloat16 eg
   # See https://github.com/bentoml/OpenLLM
   subprocess.Popen([
-    'timeout', '600', sys.executable, *('start facebook/opt-1.3b'.split())
+    'timeout', '600', sys.executable, *('-m openllm start facebook/opt-1.3b'.split())
   ])
 
   time.sleep(15)
