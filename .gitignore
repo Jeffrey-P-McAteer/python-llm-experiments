@@ -10,4 +10,6 @@ transformers_cache/*
 transformers_cache
 runner_env
 runner_env/*
+.py-env
+.py-env/*
 
