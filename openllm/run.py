@@ -5,6 +5,7 @@ import subprocess
 import shutil
 import time
 import traceback
+import asyncio
 
 python_pkgs = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.py-env')
 os.makedirs(python_pkgs, exist_ok=True)
@@ -18,6 +19,9 @@ except:
   import environmentinator
 
 os.environ['OPENLLM_DO_NOT_TRACK'] = 'True'
+os.environ['PYTHONPATH'] = python_pkgs + ':' + os.path.join(python_pkgs, '3_11') + ':' + os.environ.get('PYTHONPATH', '')
+
+print(f'Using PYTHONPATH = {os.environ["PYTHONPATH"]}')
 
 if not 'TRANSFORMERS_CACHE' in os.environ:
     os.environ['TRANSFORMERS_CACHE'] = os.path.join(
@@ -28,27 +32,60 @@ if not 'TRANSFORMERS_CACHE' in os.environ:
 print(f'Using TRANSFORMERS_CACHE = {os.environ["TRANSFORMERS_CACHE"]}')
 os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
 
+if not 'HF_HOME' in os.environ:
+    os.environ['HF_HOME'] = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        'ai_models'
+    )
 
-openllm = environmentinator.ensure_module('openllm')
+print(f'Using HF_HOME = {os.environ["HF_HOME"]}')
+os.makedirs(os.environ['HF_HOME'], exist_ok=True)
 
-# Run a test query
-try:
-  client = openllm.client.HTTPClient('http://localhost:3000')
-  print(client.query('Explain to me the difference between "further" and "farther"'))
-except:
-  traceback.print_exc()
+if not 'HF_TOKEN' in os.environ:
+  print('Please login to HF and generate a token at https://huggingface.co/settings/tokens')
+  print('Then assign to HF_TOKEN= and re-launch.')
+  sys.exit(5)
 
-  # Spawn a server for 10 minutes
-  # See perf tuning env var DTYPE=float16 vs bfloat16 eg
-  # See https://github.com/bentoml/OpenLLM
-  subprocess.Popen([
-    'timeout', '600', sys.executable, *('-m openllm start facebook/opt-1.3b'.split())
-  ])
-
-  time.sleep(15)
+hf_token = os.environ['HF_TOKEN']
 
 
-client = openllm.client.HTTPClient('http://localhost:3000')
-print(client.query('Explain to me the difference between "further" and "farther"'))
+openllm = environmentinator.ensure_module('openllm', 'openllm[vllm]')
+langchain = environmentinator.ensure_module('langchain')
+llama_index = environmentinator.ensure_module('llama_index')
+
+
+
+
+async def main(args=sys.argv):
+
+  try:
+    llm = openllm.LLM('facebook/opt-2.7b', backend='vllm')
+    print(await llm.generate('What is the meaning of life?'))
+  except:
+    traceback.print_exc()
+
+
+
+  # try:
+  #   from llama_index.llms.openllm import OpenLLM
+  #   llm = OpenLLM('HuggingFaceH4/zephyr-7b-alpha')
+  #   print(llm.complete('The meaning of life is'))
+  # except:
+  #   traceback.print_exc()
+
+
+  # try:
+  #   from langchain.llms import OpenLLM
+  #   llm = OpenLLM(model_name='llama', model_id='meta-llama/Llama-2-7b-hf', token=hf_token)
+  #   print(llm('What is the difference between a duck and a goose? And why there are so many Goose in Canada?'))
+  # except:
+  #   traceback.print_exc()
+
+
+
+
+
+if __name__ == '__main__':
+  asyncio.run(main())
 
 
