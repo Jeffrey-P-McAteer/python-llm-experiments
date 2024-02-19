@@ -19,6 +19,7 @@ os.environ['TRANSFORMERS_CACHE'] = os.environ.get('TRANSFORMERS_CACHE', os.path.
     'transformers_cache'
 ))
 os.environ['HF_HOME'] = os.environ['TRANSFORMERS_CACHE']
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
 print('Saving models in', os.environ['TRANSFORMERS_CACHE'])
 
