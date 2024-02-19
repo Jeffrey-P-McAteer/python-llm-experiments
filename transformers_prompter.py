@@ -48,6 +48,8 @@ except:
     ])
     import torch
 
+# More memory tuning
+torch.cuda.set_per_process_memory_fraction(0.8)
 
 try:
     from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
