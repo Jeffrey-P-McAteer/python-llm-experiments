@@ -19,7 +19,13 @@ os.environ['TRANSFORMERS_CACHE'] = os.environ.get('TRANSFORMERS_CACHE', os.path.
     'transformers_cache'
 ))
 os.environ['HF_HOME'] = os.environ['TRANSFORMERS_CACHE']
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+
+# See https://pytorch.org/docs/stable/notes/cuda.html#environment-variables
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = ','.join([
+    'expandable_segments:True',
+    'backend:cudaMallocAsync',
+])
+
 os.makedirs(os.environ['TRANSFORMERS_CACHE'], exist_ok=True)
 print('Saving models in', os.environ['TRANSFORMERS_CACHE'])
 
