@@ -68,6 +68,10 @@ except:
     ])
     import better_profanity
 
+_ = subprocess.Popen([
+    'find', '/mnt/scratch/swap-files', '-type', 'f', '-print', '-exec', 'sudo', 'swapon', '{}', ';'
+], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
+
 # model_name = 'bigscience/bloom'
 # model_name = 'gpt2'
 model_name = 'lmsys/longchat-13b-16k' if len(sys.argv) < 2 else sys.argv[1]
@@ -104,7 +108,7 @@ The ability to deliver ever-increasing amounts of power is especially important 
 It wasn’t long ago that a single IT rack of 10 servers would draw a total of five kilowatts (kW) of power. Today, that same rack may hold dozens of servers that collectively draw 20 or 30 kW. At those kinds of levels, you naturally want to put a premium on efficiency, as even a small percentage improvement in power consumption will mean significant dollar savings over time.
 
 Wiring is another issue. Consider a 15 kW rack. Using single-phase at 120 volts AC (VAC) power, it takes 125 amps to power the rack, which would require a wire that’s almost one-quarter inch in diameter (AWG 4) — too thick to work with easily, not to mention expensive. Because 3-phase is more efficient, it can deliver the same power (and more) using smaller wiring. To support the same 15 kW rack using 3-phase power requires three wires capable of supplying 42 amps (AWG 10), which are a fraction of the size — each less than one-tenth of an inch in diameter.
- 
+
 Single-phase AC power explained
 
 So, what is 3-phase power, exactly? And where should we use it?
@@ -165,12 +169,12 @@ except:
     traceback.print_exc()
 
 print('''
-# 
+#
 # Run text generation/model prompting (see task types) like:
 #   text-generation:    generator('Hello, my name is', max_new_tokens=200)
 #   question-answering: generator(context="The sky has been a few different colors lately, ranging from red to blue. Yesterday the sky was red. Today the sky is bluer.", question="What color is the sky?", max_new_tokens=200)
 #   summarization:      generator(long_article_text, min_length=10, max_length=50)
-# 
+#
 # Args for generator's __call__ are documented at https://huggingface.co/docs/transformers/main/en/main_classes/pipelines#transformers.TextGenerationPipeline.__call__
 #
 #
