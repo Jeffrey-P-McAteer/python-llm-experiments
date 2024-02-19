@@ -1,4 +1,6 @@
 
+# python standalone_summarizer.py 'bigscience/bloomz-3b' 'What did george washington do in virginia? How long did he live there?'
+
 # We begin with a ton of nice glue stuff
 import os           # Removes files, makes directories, misc operating system interfaces.
 import sys          # More of the same - sys.argv gives os OS arguments & sys.path is the folders python searches for libraries.
@@ -67,7 +69,7 @@ Usage:
 
   {sys.executable} {args[0]} MODEL_NAME
     Prompts for input text to summarize and uses the specified MODEL_NAME llm model to summarize it
-    
+
   {sys.executable} {args[0]} MODEL_NAME TEXT_TO_SUMMARIZE
     Uses the MODEL_NAME llm model to summarize TEXT_TO_SUMMARIZE
 
@@ -85,7 +87,7 @@ Usage:
       huggingface_model = args[1]
     else:
       text_to_summarize = args[1]
-  
+
   if len(text_to_summarize) < 2:
     text_to_summarize = input('Type some text to summarize: ')
 
@@ -93,7 +95,7 @@ Usage:
   print(f'text_to_summarize = {text_to_summarize}')
   print(f'')
 
-  
+
   lm = ModelPack(model=huggingface_model, source='huggingface', model_args={'gpu': True})
 
   prompt_text = text_to_summarize

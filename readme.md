@@ -198,7 +198,7 @@ Goodbye!
 ```bash
 MAX_MEM=9G TRANSFORMERS_CACHE=/mnt/scratch/llm-models memlimit python transformers_prompter.py 'mistralai/Mistral-7B-v0.1'
 
-
+MAX_MEM=9G memlimit python standalone_summarizer.py 'bigscience/bloomz-3b' 'What did george washington do in virginia? How long did he live there?'
 
 ```
 
