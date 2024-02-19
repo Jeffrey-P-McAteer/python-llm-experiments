@@ -193,5 +193,12 @@ Success! You took 3.6666666666666665 steps to solve Jasmine Roberts and Ann Weav
 Goodbye!
 ```
 
+# Misc R&D
 
+```bash
+MAX_MEM=9G TRANSFORMERS_CACHE=/mnt/scratch/llm-models memlimit python transformers_prompter.py 'mistralai/Mistral-7B-v0.1'
+
+
+
+```
 
